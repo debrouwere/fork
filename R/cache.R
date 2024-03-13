@@ -5,7 +5,7 @@
 # process is cached at any time, so this cache relies on a good ordering of the
 # processes (last step changest fastest) to function effectively.
 
-library('stringr')
+library("stringr")
 
 #' Test for absence of NAs
 #'
@@ -52,7 +52,7 @@ make_cache <- function(scenarios) {
   cache <- as.list(rep(NA, length(steps)))
   names(cache) <- steps
   slots <- list2env(cache)
-  attr(slots, 'steps') <- steps
+  attr(slots, "steps") <- steps
   slots
 }
 
@@ -66,8 +66,8 @@ make_cache <- function(scenarios) {
 #'
 #' @return The partially invalidated cache.
 #' @export
-invalidate_cache <- function(cache, start_at_ix=1) {
-  steps <- attr(cache, 'steps', exact=TRUE)
+invalidate_cache <- function(cache, start_at_ix = 1) {
+  steps <- attr(cache, "steps", exact = TRUE)
   n <- length(steps)
   for (i in start_at_ix:n) {
     name <- steps[i]
@@ -108,7 +108,7 @@ noop <- function(input) {
 #' }
 step_through <- function(scenario, cache) {
   function(name, processor) {
-    steps <- attr(cache, 'steps', exact=TRUE)
+    steps <- attr(cache, "steps", exact = TRUE)
     curr_ix <- which.max(steps == name)
     curr <- steps[curr_ix]
     prev_ix <- curr_ix - 1
@@ -117,8 +117,16 @@ step_through <- function(scenario, cache) {
     cache[[curr]] <- if (!all(is.na(cache[[curr]]))) {
       cache[[curr]]
     } else {
-      input <- if (prev_ix > 0) { cache[[prev]] } else { NA }
-      process <- if (is_needed(scenario[[curr]])) { processor } else { noop }
+      input <- if (prev_ix > 0) {
+        cache[[prev]]
+      } else {
+        NA
+      }
+      process <- if (is_needed(scenario[[curr]])) {
+        processor
+      } else {
+        noop
+      }
       process(input)
     }
   }

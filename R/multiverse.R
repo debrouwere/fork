@@ -1,5 +1,5 @@
-library('tidyr')
-library('dplyr')
+library("tidyr")
+library("dplyr")
 
 #' Create a tibble from all combinations of inputs
 #'
@@ -26,20 +26,20 @@ grid <- expand_grid
 #' @export
 #'
 #' @examples
-#' tibble(analysis=c("lm", "glm")) %>% fork(analysis="glm", family=c("logit", "probit"))
+#' tibble(analysis = c("lm", "glm")) %>% fork(analysis = "glm", family = c("logit", "probit"))
 fork <- function(.left, ...) {
   .right <- grid(...)
   if (length(intersect(colnames(.left), colnames(.right)))) {
-    left_join(.left, .right, relationship='many-to-many')
+    left_join(.left, .right, relationship = "many-to-many")
   } else {
     cross_join(.left, .right)
   }
 }
 
 na_replacements <- list(
-  character='',
-  numeric=0,
-  logical=FALSE
+  character = "",
+  numeric = 0,
+  logical = FALSE
 )
 
 #' Replace NAs with falsey values, depending on the type of vector
@@ -86,10 +86,10 @@ replace_na_with_false <- function(data) {
 plan_cache <- function(scenarios) {
   scenarios_chr <- scenarios |>
     mutate(across(everything(), as.character)) |>
-    mutate(across(everything(), ~ replace_na(.x, '<NA>')))
+    mutate(across(everything(), ~ replace_na(.x, "<NA>")))
 
   start_at_ix <- map_int(2:nrow(scenarios_chr), function(i) {
-    which.min(scenarios_chr[i,] == scenarios_chr[i - 1,])
+    which.min(scenarios_chr[i, ] == scenarios_chr[i - 1, ])
   })
 
   # adjust start_at indices to account for groups (i.e. df-columns)
@@ -115,7 +115,7 @@ plan_cache <- function(scenarios) {
 #'
 #' @return A numeric vector of penalties.
 #' @export
-penalize_scenarios <- function(scenarios, exclude=NULL) {
+penalize_scenarios <- function(scenarios, exclude = NULL) {
   if (is.null(exclude)) exclude <- c()
 
   scenarios |>
@@ -133,12 +133,12 @@ penalize_scenarios <- function(scenarios, exclude=NULL) {
 #'
 #' @return A tibble with scenarios packed into df-columns and annotated with additional columns.
 #' @export
-plan_scenarios <- function(scenarios, do_not_penalize=NULL) {
-  scenarios$penalty <- penalize_scenarios(scenarios, exclude=do_not_penalize)
+plan_scenarios <- function(scenarios, do_not_penalize = NULL) {
+  scenarios$penalty <- penalize_scenarios(scenarios, exclude = do_not_penalize)
   scenarios$start_at <- plan_cache(scenarios)
 
   # changes variable ordering but does not matter at this stage
-  pack_by_sep(scenarios, sep='.')
+  pack_by_sep(scenarios, sep = ".")
 }
 
 exists <- function(x) {
@@ -168,6 +168,6 @@ silence <- function(fn, error_handler) {
   function(...) {
     # without `as.function`, any error handler we pass will be interpreted as an
     # expression and will not get executed
-    tryCatch(fn(...), error=as.function(error_handler))
+    tryCatch(fn(...), error = as.function(error_handler))
   }
 }

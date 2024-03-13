@@ -14,7 +14,7 @@
 # browsing it is easier without packed columns, and so `unpack_by_sep` converts
 # back to the original format.
 
-library('tibble')
+library("tibble")
 
 #' Extract the column name prefixes from a dataset
 #'
@@ -26,7 +26,7 @@ library('tibble')
 #'
 #' @return A character vector of column name prefixes.
 #' @export
-dotprefix <- function(data, sep='.', subset=FALSE) {
+dotprefix <- function(data, sep = ".", subset = FALSE) {
   if (subset) {
     names <- str_subset(colnames(data), coll(sep))
   } else {
@@ -43,8 +43,8 @@ dotprefix <- function(data, sep='.', subset=FALSE) {
 #'
 #' @return A character vector of column name prefixes.
 #' @export
-dotnames <- function(data, sep='.', subset=FALSE) {
-  unique(dotprefix(data, sep=sep, subset=subset))
+dotnames <- function(data, sep = ".", subset = FALSE) {
+  unique(dotprefix(data, sep = sep, subset = subset))
 }
 
 #' Pack columns that have a prefix.suffix format into df-columns.
@@ -54,9 +54,9 @@ dotnames <- function(data, sep='.', subset=FALSE) {
 #'
 #' @return A tibble with df-columns.
 #' @export
-pack_by_sep <- function(data, sep='.') {
-  for (dotname in dotnames(data, subset=TRUE)) {
-    data <- data |> pack({{ dotname }} := starts_with(dotname), .names_sep=sep)
+pack_by_sep <- function(data, sep = ".") {
+  for (dotname in dotnames(data, subset = TRUE)) {
+    data <- data |> pack({{ dotname }} := starts_with(dotname), .names_sep = sep)
   }
   data
 }
@@ -82,9 +82,9 @@ packnames <- function(data) {
 #'
 #' @return A tibble without df-columns.
 #' @export
-unpack_by_sep <- function(data, sep='.') {
+unpack_by_sep <- function(data, sep = ".") {
   packs <- packnames(data)
-  data <- data |> unpack(all_of(packs), names_sep=sep)
-  redundancies <- intersect(colnames(data), str_glue('{packs}.{packs}'))
+  data <- data |> unpack(all_of(packs), names_sep = sep)
+  redundancies <- intersect(colnames(data), str_glue("{packs}.{packs}"))
   data |> rename_with(~ str_split_i(.x, coll(sep), 1), all_of(redundancies))
 }
