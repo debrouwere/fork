@@ -1,33 +1,3 @@
-# Lightweight helper functions for multiverse analyses
-#
-# Existing packages for multiverse analyses such as `multiverse` on CRAN
-# (Abhraneel Sarma, Matthew Kay) or the language-agnostic `Boba` (Yang Liu, Alex
-# Kale, Tim Althoff, Jeffrey Heer) rely on a domain-specific language to specify
-# branches, which allows multiverse branches to be specified without a bunch of
-# if/elses that mess up the code flow. The downside to this approach is that
-# they cannot be run as a plain R script or inside of an interactive session,
-# and force you into a certain way of doing things. They also assume that every
-# universe is independent of every other universe, so they miss opportunities to
-# cache shared paths before they diverge. (Boba in particular does provide
-# wonderful visualizations of the resulting multiverse, though!)
-#
-# The code below, instead, is a sort of minimum viable approach to multiverse
-# specifications. It provides a `fork` function to easily specify partial cross
-# products of analytic choices, and an assortment of functions to help setting
-# up a cache, ranking universes from most to least favored, and so on. Scenarios
-# (universes) produced by repeated calls to `fork` are ordered to be maximally
-# cacheable with a low memory footprint.
-#
-# This lightweight approach does not do away with branching, but it minimizes
-# their depth to one or two levels so that the resulting code still flows nicely
-# and is easy to reason about.
-#
-# In principe, multiverse analyses can be executed on multiple cores, but this
-# requires a separate cache and a separate call to `plan_scenarios` for each
-# core -- just partition the scenarios into two, three, four, etc. and then call
-# the function on each part -- otherwise the cache hints provided by the plan
-# will be wrong.
-
 library('tidyr')
 library('dplyr')
 

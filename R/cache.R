@@ -97,16 +97,14 @@ noop <- function(input) {
 #' scenarios <- expand_grid(add=1:3, multiply=1:3)
 #' cache <- make_cache(scenarios)
 #' output <- lapply(1:nrow(scenarios), function(i) {
-#'   for (i in 1:nrow(scenarios)) {
-#'     step <- step_through(scenario, cache)
-#'     step('add', function(input) {
-#'       10 + scenario$add
-#'     })
-#'     step('multiply', function(input) {
-#'       input * scenario$multiply
-#'     })
-#'     return(cache$multiply)
-#'   }
+#'   step <- step_through(scenario, cache)
+#'   step('add', function(input) {
+#'     10 + scenario$add
+#'   })
+#'   step('multiply', function(input) {
+#'     input * scenario$multiply
+#'   })
+#'   return(cache$multiply)
 #' }
 step_through <- function(scenario, cache) {
   function(name, processor) {
