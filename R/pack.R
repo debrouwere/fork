@@ -26,12 +26,8 @@ library("tibble")
 #'
 #' @return A character vector of column name prefixes.
 #' @export
-dotprefix <- function(data, sep = ".", subset = FALSE) {
-  if (subset) {
-    names <- str_subset(colnames(data), coll(sep))
-  } else {
-    names <- colnames(data)
-  }
+dotprefix <- function(names, sep = ".", subset = FALSE) {
+  if (subset) names <- str_subset(names, coll(sep))
   str_split_i(names, coll(sep), 1)
 }
 
@@ -44,7 +40,11 @@ dotprefix <- function(data, sep = ".", subset = FALSE) {
 #' @return A character vector of column name prefixes.
 #' @export
 dotnames <- function(data, sep = ".", subset = FALSE) {
-  unique(dotprefix(data, sep = sep, subset = subset))
+  unique(dotprefix(colnames(data), sep = sep, subset = subset))
+}
+
+dotattr <- function(data, key, sep = ".", subset = FALSE) {
+  unique(dotprefix(attr(data, key, exact = TRUE), sep = sep, subset = subset))
 }
 
 #' Pack columns that have a prefix.suffix format into df-columns.

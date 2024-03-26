@@ -4,7 +4,7 @@
 \alias{fork}
 \title{Create a tibble from partial combinations of inputs}
 \usage{
-fork(.left, ...)
+fork(.left, .sep = ".", ...)
 }
 \arguments{
 \item{.left}{A tibble as created with \code{grid}, \code{tibble}, \code{tribble} or a previous call to \code{fork}}
@@ -18,5 +18,5 @@ A tibble.
 Create a tibble from partial combinations of inputs
 }
 \examples{
-tibble(analysis=c("lm", "glm")) \%>\% fork(analysis="glm", family=c("logit", "probit"))
+tibble(analysis = c("lm", "glm")) \%>\% fork(analysis = "glm", family = c("logit", "probit"))
 }

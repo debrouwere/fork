@@ -27,12 +27,17 @@ grid <- expand_grid
 #'
 #' @examples
 #' tibble(analysis = c("lm", "glm")) %>% fork(analysis = "glm", family = c("logit", "probit"))
-fork <- function(.left, ...) {
+fork <- function(.left, .sep='.', ...) {
   .right <- grid(...)
+  forks <- attr(.left, 'forks', exact = TRUE)
   if (length(intersect(colnames(.left), colnames(.right)))) {
-    left_join(.left, .right, relationship = "many-to-many")
+    forks <- c(forks, setdiff(colnames(.right), colnames(.left)))
+    left_join(.left, .right, relationship = "many-to-many") |>
+      structure(forks=forks)
   } else {
-    cross_join(.left, .right)
+    forks <- c(forks, colnames(.right))
+    cross_join(.left, .right) |>
+      structure(forks=forks)
   }
 }
 
@@ -57,15 +62,31 @@ na_replacements <- list(
 #'   * `is.na(x) | !x)` can be replaced with `!x`
 #'   * `!is.na(x) & x == 'abc'` can be replaced with `x == 'abc'`
 #'
-#' `replace_na_with_false` must be called explicitly, it is not a part of the
+#' `replace_na_with_falsey` must be called explicitly, it is not a part of the
 #' behavior of `fork`
 #'
 #' @export
-replace_na_with_false <- function(data) {
+replace_na_with_falsey <- function(data) {
   structure <- map_chr(data, \(x) class(x)[1])
   replacements <- na_replacements[structure]
   names(replacements) <- colnames(data)
   replace_na(data, replacements)
+}
+
+
+#' Replace NAs with FALSE
+#'
+#' @description By default, this function only replaces NAs in "first-level"
+#'   columns, e.g. in 'a' but not 'a.b'. It is meant to eventually replace
+#'   `fork::replace_na_with_falsey`.
+#'
+#' @param data a data frame
+#' @param names list of column names
+#'
+#' @export
+replace_na_with_false <- function(data, names = NULL) {
+  if (is.null(names)) names <- dotnames(data)
+  data |> mutate(across(any_of(names), \(col) replace_na(col, FALSE)))
 }
 
 
@@ -139,35 +160,4 @@ plan_scenarios <- function(scenarios, do_not_penalize = NULL) {
 
   # changes variable ordering but does not matter at this stage
   pack_by_sep(scenarios, sep = ".")
-}
-
-exists <- function(x) {
-  !any(is.na(x))
-}
-
-# we assume that a step that has multiple parameters, contained within a df-column,
-# will describe in its first sub-column whether the analysis is needed;
-# this is naturally what `pack_by_sep` will do if a <step> variable is defined before
-# any <step>_<parameter> variables, but still good to keep in mind;
-# this function also works with regular columns
-is_needed <- function(x) {
-  !(is.na(x[[1]]) | x[[1]] == FALSE)
-}
-
-# TODO: we'll probably want to add some memoization (with on-disk persistence) so that
-# we don't have to start all over again if something goes wrong halfway through;
-# something like Redis would do the job nicely (it's simple keys and values, a single
-# number per analysis), but let's see how fast or slow this is anyway
-
-
-
-# NOTE: I think this can be replaced with `safely` from the `purrr`
-# library, although it will nest the output in a `list(result, error)`
-# so it requires some additional unnesting.
-silence <- function(fn, error_handler) {
-  function(...) {
-    # without `as.function`, any error handler we pass will be interpreted as an
-    # expression and will not get executed
-    tryCatch(fn(...), error = as.function(error_handler))
-  }
 }

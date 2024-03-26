@@ -1,5 +1,11 @@
 library("testthat")
 
+steps <- list(
+  start_with=function(start_with, ...) { list(data = start_with) },
+  add_once=function(data, ...) { list(data = data + 11) },
+  add_once_more=function(data, ...) { list(data = data + 22 )}
+)
+
 test_that("cache invalidation works", {
   scenarios <- tibble(start_with = 33, add_once = 11, add_once_more = 22)
   cache <- make_cache(scenarios)

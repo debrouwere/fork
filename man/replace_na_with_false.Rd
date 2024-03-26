@@ -2,25 +2,17 @@
 % Please edit documentation in R/multiverse.R
 \name{replace_na_with_false}
 \alias{replace_na_with_false}
-\title{Replace NAs with falsey values, depending on the type of vector}
+\title{Replace NAs with FALSE}
 \usage{
-replace_na_with_false(data)
+replace_na_with_false(data, names = NULL)
 }
 \arguments{
-\item{data}{A vector.}
+\item{data}{a data frame}
+
+\item{names}{list of column names}
 }
 \description{
-To state the obvious, it is not in general a good idea to replace NA values
-with FALSE or its equivalents, but in the context of a multiverse scenario,
-NA is meant to convey that the parameter does not apply and so its value is
-irrelevant.
-
-Replacing NA with falsey values in scenarios allows for much easier filtering:
-\itemize{
-\item \verb{is.na(x) | !x)} can be replaced with \code{!x}
-\item \code{!is.na(x) & x == 'abc'} can be replaced with \code{x == 'abc'}
-}
-
-\code{replace_na_with_false} must be called explicitly, it is not a part of the
-behavior of \code{fork}
+By default, this function only replaces NAs in "first-level"
+columns, e.g. in 'a' but not 'a.b'. It is meant to eventually replace
+\code{fork::replace_na_with_falsey}.
 }

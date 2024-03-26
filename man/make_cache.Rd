@@ -4,14 +4,18 @@
 \alias{make_cache}
 \title{Initialize a simple step cache}
 \usage{
-make_cache(scenarios)
+make_cache(steps)
 }
 \arguments{
-\item{scenarios}{}
+\item{steps}{a named list, whose names describe the steps to cache}
 }
 \value{
 A cache environment.
 }
 \description{
-Initialize a simple step cache
+We cache the steps of a process, and then for any subsequent
+similar process we use the cache of the last step before the process
+diverges. Only one process is cached at any time, so this cache relies on a
+good ordering of the processes (last step changest fastest) and user-managed
+cache invalidation to function effectively.
 }
