@@ -75,3 +75,6 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# other
+sandbox/
