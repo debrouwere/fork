@@ -1,7 +1,7 @@
-library('rlang')
-library('purrr')
-library('stringr')
-library('cli')
+library("rlang")
+library("purrr")
+library("stringr")
+library("cli")
 
 #' Verify whether each fork in a multiverse specification has a corresponding step function.
 #'
@@ -10,14 +10,14 @@ library('cli')
 #'
 #' @export
 verify_steps <- function(steps, scenarios) {
-  expected <- dotattr(scenarios, 'forks')
+  expected <- dotattr(scenarios, "forks")
   actual <- names(steps)
   missing <- setdiff(expected, actual)
   if (length(missing)) {
     abort_cli(str_c(
-      'Please add missing steps to analysis pipeline: ',
+      "Please add missing steps to analysis pipeline: ",
       str_flatten_comma(missing),
-      '. If nothing should happen, use the fork::noop function.'
+      ". If nothing should happen, use the fork::noop function."
     ))
   }
 }
@@ -30,21 +30,21 @@ describe_steps <- function(steps, scenarios) {
   for (step in names(steps)) {
     if (step %in% colnames(scenarios)) {
       n <- sum(!pull(scenarios, step))
-      print(str_glue('* {step} (linked to `scenarios${step}`, {n} analyses (out of {total})'))
+      print(str_glue("* {step} (linked to `scenarios${step}`, {n} analyses (out of {total})"))
     } else {
-      print(str_glue('* {step}'))
+      print(str_glue("* {step}"))
     }
   }
 }
 
-enhance_steps <- function(steps, cache=NULL) {
+enhance_steps <- function(steps, cache = NULL) {
   steps <- imap(steps, function(fn, name) {
     rethrow_with_args(fn, name = name)
   })
 
   if (!is.null(cache)) {
     steps <- imap(steps, function(fn, key) {
-      cached(fn, cache=cache, key=key)
+      cached(fn, cache = cache, key = key)
     })
   }
 
@@ -85,34 +85,34 @@ enhance_steps <- function(steps, cache=NULL) {
 #'
 #' @examples
 #' scenarios <- expand_grid(
-#'   add=1:3,
-#'   multiply=1:3
+#'   add = 1:3,
+#'   multiply = 1:3
 #' )
 #' steps <- list(
-#'   add=function(add, ...) {
+#'   add = function(add, ...) {
 #'     list(
 #'       sum = 10 + add
 #'     )
 #'   },
-#'   multiply=function(sum, multiply, ...) {
-#'     list(result=tibble(
-#'       sumprod=sum * multiply
+#'   multiply = function(sum, multiply, ...) {
+#'     list(result = tibble(
+#'       sumprod = sum * multiply
 #'     ))
 #'   }
 #' )
 #'
-#' analyze <- compose_steps(steps, cache=NULL)
+#' analyze <- compose_steps(steps, cache = NULL)
 #'
 #' # we'll create a cache but refrain from using it for now
 #' cache <- make_cache(steps)
-#' analyze_and_cache <- compose_steps(steps, cache=cache)
+#' analyze_and_cache <- compose_steps(steps, cache = cache)
 #'
-#' result <- analyze(add=1, multiply=2)
+#' result <- analyze(add = 1, multiply = 2)
 #' expect_equal(result, 22)
 #'
 #' results <- scenarios |> row_modify(analyze)
 #' expect_equal(results$sumprod, c(11, 22, 33, 12, 24, 36, 13, 26, 39))
-compose_steps <- function(steps, cache=NULL, select=last) {
+compose_steps <- function(steps, cache = NULL, select = last) {
   if (!is.null(cache)) {
     invalidate <- function(input) {
       invalidate_cache(cache, input$start_at_ix)
@@ -121,6 +121,6 @@ compose_steps <- function(steps, cache=NULL, select=last) {
   } else {
     invalidate <- identity
   }
-  steps <- enhance_steps(steps, cache=cache)
+  steps <- enhance_steps(steps, cache = cache)
   compose(noop, invalidate, !!!steps, select, .dir = "forward")
 }

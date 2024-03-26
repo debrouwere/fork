@@ -1,8 +1,8 @@
-library('rlang')
-library('purrr')
-library('dplyr')
-library('stringr')
-library('cli')
+library("rlang")
+library("purrr")
+library("dplyr")
+library("stringr")
+library("cli")
 
 
 #' Wrap a function to run it and pass through its arguments
@@ -70,7 +70,7 @@ noop <- function(...) {
 #' @export
 row_modify <- function(data, fn) {
   results <- data |>
-    group_by(.ix=row_number()) |>
+    group_by(.ix = row_number()) |>
     group_modify(\(x, g) fn(x)) |>
     ungroup() |>
     select(-.ix)
@@ -79,13 +79,13 @@ row_modify <- function(data, fn) {
 
 obj_to_chr <- function(x) {
   case_match(class(x)[1],
-             'character' ~ str_trunc(str_flatten_comma(x), width=50),
-             'numeric' ~ str_trunc(str_flatten_comma(format(x)), width=50),
-             'integer' ~ str_trunc(str_flatten_comma(as.character(x)), width=50),
-             'logical' ~ str_trunc(str_flatten_comma(as.character(x)), width=50),
-             'list' ~ str_glue('list({keys})', keys=str_trunc(str_flatten_comma(names(x)), width=44)),
-             .default = str_glue('{cls}(...)', cls=class(x)[1]),
-             .ptype = character(0)
+    "character" ~ str_trunc(str_flatten_comma(x), width = 50),
+    "numeric" ~ str_trunc(str_flatten_comma(format(x)), width = 50),
+    "integer" ~ str_trunc(str_flatten_comma(as.character(x)), width = 50),
+    "logical" ~ str_trunc(str_flatten_comma(as.character(x)), width = 50),
+    "list" ~ str_glue("list({keys})", keys = str_trunc(str_flatten_comma(names(x)), width = 44)),
+    .default = str_glue("{cls}(...)", cls = class(x)[1]),
+    .ptype = character(0)
   )
 }
 
@@ -97,18 +97,18 @@ obj_to_chr <- function(x) {
 #' @export
 rethrow_with_args <- function(fn, name) {
   function(...) {
-    args <- dots_list(..., .named=TRUE)
+    args <- dots_list(..., .named = TRUE)
     try_fetch(
       fn(...),
-      error=function(condition) {
+      error = function(condition) {
         locals <- args |>
-          imap(\(v, k) str_c(k, ': ', obj_to_chr(v))) |>
+          imap(\(v, k) str_c(k, ": ", obj_to_chr(v))) |>
           as.character() |>
-          set_names('i')
+          set_names("i")
         cli_abort(
-          message='Function `{.strong {name}}` raised an error.',
-          body=locals,
-          parent=condition
+          message = "Function `{.strong {name}}` raised an error.",
+          body = locals,
+          parent = condition
         )
       }
     )

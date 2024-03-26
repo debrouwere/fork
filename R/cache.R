@@ -32,7 +32,7 @@ make_cache <- function(steps) {
 #' @param key The key in which to store the cached outcome.
 #'
 #' @export
-cached <- function (fn, cache, key) {
+cached <- function(fn, cache, key) {
   function(...) {
     if (all(is.na(cache[[key]]))) {
       cache[[key]] <- fn(...)

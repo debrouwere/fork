@@ -27,17 +27,17 @@ grid <- expand_grid
 #'
 #' @examples
 #' tibble(analysis = c("lm", "glm")) %>% fork(analysis = "glm", family = c("logit", "probit"))
-fork <- function(.left, .sep='.', ...) {
+fork <- function(.left, .sep = ".", ...) {
   .right <- grid(...)
-  forks <- attr(.left, 'forks', exact = TRUE)
+  forks <- attr(.left, "forks", exact = TRUE)
   if (length(intersect(colnames(.left), colnames(.right)))) {
     forks <- c(forks, setdiff(colnames(.right), colnames(.left)))
     left_join(.left, .right, relationship = "many-to-many") |>
-      structure(forks=forks)
+      structure(forks = forks)
   } else {
     forks <- c(forks, colnames(.right))
     cross_join(.left, .right) |>
-      structure(forks=forks)
+      structure(forks = forks)
   }
 }
 

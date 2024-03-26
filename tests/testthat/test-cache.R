@@ -1,9 +1,15 @@
 library("testthat")
 
 steps <- list(
-  start_with=function(start_with, ...) { list(data = start_with) },
-  add_once=function(data, ...) { list(data = data + 11) },
-  add_once_more=function(data, ...) { list(data = data + 22 )}
+  start_with = function(start_with, ...) {
+    list(data = start_with)
+  },
+  add_once = function(data, ...) {
+    list(data = data + 11)
+  },
+  add_once_more = function(data, ...) {
+    list(data = data + 22)
+  }
 )
 
 test_that("cache invalidation works", {
