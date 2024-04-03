@@ -104,24 +104,26 @@ replace_na_with_false <- function(data, names = NULL) {
 #'
 #' @return An integer vector with cache invalidation positions.
 #' @export
-plan_cache <- function(scenarios) {
-  scenarios_chr <- scenarios |>
+plan_cache <- function(scenarios, cache) {
+  prefixes <- attr(cache, 'steps', exact = TRUE)
+  missing_steps <- setdiff(prefixes, colnames(scenarios))
+  parameters <- scenarios
+  parameters[, missing_steps] <- NA
+  parameters <- parameters |>
+    select(starts_with(prefixes)) |>
     mutate(across(everything(), as.character)) |>
     mutate(across(everything(), ~ replace_na(.x, "<NA>")))
 
-  start_at_ix <- map_int(2:nrow(scenarios_chr), function(i) {
-    which.min(scenarios_chr[i, ] == scenarios_chr[i - 1, ])
+  start_at_j <- map_int(2:nrow(parameters), function(i) {
+    ix <- which.min(parameters[i, ] == parameters[i - 1, ])
   })
 
-  # adjust start_at indices to account for groups (i.e. df-columns)
-  steps <- dotnames(scenarios)
-  groups <- dotprefix(scenarios)
-  start_at_group <- groups[start_at_ix]
-  start_at_step_ix <- map_int(start_at_group, function(group) {
-    which.max(group == steps)
+  ixs <- dotprefix(colnames(parameters))
+  start_at_ix <- map_int(start_at_j, function(j) {
+    which(prefixes == ixs[j])
   })
 
-  c(1, start_at_step_ix)
+  c(1, start_at_ix)
 }
 
 #' Roughly sort scenarios from preferred to disliked
