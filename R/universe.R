@@ -122,5 +122,5 @@ compose_steps <- function(steps, cache = NULL, select = last) {
     invalidate <- identity
   }
   steps <- enhance_steps(steps, cache = cache)
-  compose(invalidate, !!!steps, select, .dir = "forward")
+  compose(splat, invalidate, !!!steps, select, .dir = "forward")
 }

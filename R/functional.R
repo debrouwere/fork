@@ -56,6 +56,8 @@ noop <- function(...) {
   list(...)
 }
 
+splat <- noop
+
 #' Modify the rows of a data frame, one at a time, and bind the results with the
 #' original rows
 #'
