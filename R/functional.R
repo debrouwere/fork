@@ -97,15 +97,15 @@ obj_to_chr <- function(x) {
 #' @export
 rethrow_with_args <- function(fn, name) {
   function(...) {
-    args <- dots_list(..., .named = TRUE)
-    try_fetch(
+    args <- rlang::dots_list(..., .named = TRUE)
+    rlang::try_fetch(
       fn(...),
       error = function(condition) {
         locals <- args |>
           imap(\(v, k) str_c(k, ": ", obj_to_chr(v))) |>
           as.character() |>
           set_names("i")
-        cli_abort(
+        cli::cli_abort(
           message = "Function `{.strong {name}}` raised an error.",
           body = locals,
           parent = condition
