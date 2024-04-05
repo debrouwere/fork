@@ -1,3 +1,13 @@
+kvs <- function(keys, values) {
+  if (length(values) == 1 & length(values) < length(keys)) {
+    values <- rep(values, length(keys))
+  }
+
+  l <- as.list(values)
+  names(l) <- keys
+  l
+}
+
 #' Initialize a simple step cache
 #'
 #' @description We cache the steps of a process, and then for any subsequent
@@ -12,11 +22,16 @@
 #' @export
 make_cache <- function(steps) {
   steps <- names(steps)
-  cache <- as.list(rep(NA, length(steps)))
-  names(cache) <- steps
+  cache <- kvs(steps, NA)
   slots <- list2env(cache)
   attr(slots, "steps") <- steps
+  attr(slots, "hits") <- kvs(steps, 0)
+  attr(slots, "misses") <- kvs(steps, 0)
   slots
+}
+
+increment <- function(obj, which, key) {
+  attr(obj, which)[[key]] <- attr(obj, which)[[key]] + 1
 }
 
 #' Wrap a function to cache its outcome
@@ -35,7 +50,10 @@ make_cache <- function(steps) {
 cached <- function(fn, cache, key) {
   function(...) {
     if (all(is.na(cache[[key]]))) {
+      increment(cache, 'misses', key)
       cache[[key]] <- fn(...)
+    } else {
+      increment(cache, 'hits', key)
     }
     cache[[key]]
   }
