@@ -42,6 +42,10 @@ enhance_steps <- function(steps, cache = NULL) {
     rethrow_with_args(fn, name = name)
   })
 
+  steps <- imap(steps, function(fn, key) {
+    do_if(fn, key = key, otherwise = list())
+  })
+
   if (!is.null(cache)) {
     steps <- imap(steps, function(fn, key) {
       cached(fn, cache = cache, key = key)

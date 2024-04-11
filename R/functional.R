@@ -42,6 +42,34 @@ modifier <- function(fn) {
   }
 }
 
+#' Only execute a function if a particular argument is truthy
+#'
+#' @param fn A function to modify
+#' @param key The name of an argument
+#' @param otherwise The return value if the function is not executed
+
+#' @export
+do_if <- function(fn, key, otherwise) {
+  function(...) {
+    input <- list(...)
+    value <- input[[key]]
+    if (is.list(value)) {
+      value <- value[[key]]
+    }
+
+    # NOTE: this is not how I think this function should work -- presence
+    # of the parameter should be enforced and it should be logical...
+    # but we'll do it this way for now, to get started
+    if (is.null(value)) {
+      fn(...)
+    } else if (!value | is.na(value)) {
+      otherwise
+    } else {
+      fn(...)
+    }
+  }
+}
+
 # like `identity` but with a splat
 
 #' Return the function arguments as a list.
