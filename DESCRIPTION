@@ -1,6 +1,6 @@
 Package: fork
 Title: Lightweight Helper Functions For Multiverse Analyses
-Version: 0.2.6
+Version: 0.3.0
 Authors@R: 
     person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
