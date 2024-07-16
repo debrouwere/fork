@@ -25,7 +25,7 @@ invisibly <- function(f) {
 #' @param fn A function to modify.
 #'
 #' @export
-unsplat <- function(fn) {
+unsplatted <- function(fn) {
   function(args) {
     do.call(fn, args)
   }
@@ -45,24 +45,20 @@ modifier <- function(fn) {
 #' Only execute a function if a particular argument is truthy
 #'
 #' @param fn A function to modify
-#' @param key The name of an argument
+#' @param path The name of an argument (or component thereof)
 #' @param otherwise The return value if the function is not executed
 
 #' @export
-do_if <- function(fn, key, otherwise) {
-  function(...) {
-    input <- list(...)
-    value <- input[[key]]
-    if (is.list(value)) {
-      value <- value[[key]]
-    }
+skippable <- function(fn, path, otherwise) {
+  if (is.null(path)) {
+    key <- attr(fn, 'link', exact = TRUE)
+  }
 
-    # NOTE: this is not how I think this function should work -- presence
-    # of the parameter should be enforced and it should be logical...
-    # but we'll do it this way for now, to get started
-    if (is.null(value)) {
-      fn(...)
-    } else if (!value | is.na(value)) {
+  function(...) {
+    arguments <- list2(...)
+    value <- pluck(arguments, path)
+
+    if (!value | is.na(value)) {
       otherwise
     } else {
       fn(...)
@@ -74,17 +70,15 @@ do_if <- function(fn, key, otherwise) {
 
 #' Return the function arguments as a list.
 #'
-#' @description `noop` works similarly to `identity` but returns all of its arguments as a list.
+#' @description `splat` works similarly to `identity` but returns all of its arguments as a list, not just the first one.
 #'
 #' @param ... function arguments
 #'
 #' @return a list of arguments
 #' @export
-noop <- function(...) {
+splat <- function(...) {
   list(...)
 }
-
-splat <- noop
 
 #' Modify the rows of a data frame, one at a time, and bind the results with the
 #' original rows
@@ -125,7 +119,11 @@ obj_to_chr <- function(x) {
 #' @param name Name of the function.
 #'
 #' @export
-rethrow_with_args <- function(fn, name) {
+rethrow_with_arguments <- function(fn, name = NULL) {
+  if (is.null(name)) {
+    name <- attr(fn, 'name', exact = TRUE)
+  }
+
   function(...) {
     args <- rlang::dots_list(..., .named = TRUE)
     rlang::try_fetch(
