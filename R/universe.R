@@ -37,6 +37,51 @@ describe_steps <- function(steps, scenarios) {
   }
 }
 
+#' Link steps to scenario columns
+#'
+#' @param steps
+#' @param scenarios
+#' @param verbose
+#'
+#' @export
+link <- function(steps, scenarios, verbose=TRUE) {
+  steps <- pmap(steps, names(steps), seq_along(steps), function(step, name, index) {
+    attr(step, 'index') <- index
+    attr(step, 'name') <- name
+
+    if (name %in% colnames(scenarios)) {
+      # support for df-columns, select with `purrr:pluck(df, !!!path)`
+      if (is_tibble(scenarios[[name]])) {
+        path <- c(name, name)
+      } else {
+        path <- c(name)
+      }
+      attr(step, 'link') <- path
+    }
+  })
+}
+
+#' Reroute named arguments (or a component thereof) to other named arguments
+#'
+#' @param fn
+#' @param ...
+#'
+#' @export
+#'
+#' @examples
+#' invalidate_cache_by_ix <- reroute(invalidate_cache, start_at_ix=c('input', 'start_at_ix'))
+reroute <- function(.fn, ...) {
+  paths <- list2(...)
+  function(...) {
+    arguments <- list2(...)
+    rerouted_arguments <- map(paths, function(path) {
+      pluck(arguments, !!!path)
+    })
+    do.call(.fn, rerouted_arguments)
+  }
+}
+
+
 enhance_steps <- function(steps, cache = NULL) {
   steps <- imap(steps, function(fn, name) {
     rethrow_with_args(fn, name = name)
