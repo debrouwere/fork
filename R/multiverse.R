@@ -67,7 +67,7 @@ na_replacements <- list(
 #'
 #' @export
 replace_na_with_falsey <- function(data) {
-  structure <- map_chr(data, \(x) class(x)[1])
+  structure <- map_chr(data, \(x) last(class(x)))
   replacements <- na_replacements[structure]
   names(replacements) <- colnames(data)
   replace_na(data, replacements)
@@ -104,7 +104,7 @@ replace_na_with_false <- function(data, names = NULL) {
 #'
 #' @return An integer vector with cache invalidation positions.
 #' @export
-plan_cache <- function(scenarios, cache) {
+plan_cache_invalidation <- function(scenarios, cache) {
   prefixes <- attr(cache, 'steps', exact = TRUE)
   missing_steps <- setdiff(prefixes, colnames(scenarios))
   parameters <- scenarios
