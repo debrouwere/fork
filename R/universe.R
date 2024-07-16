@@ -45,7 +45,7 @@ describe_steps <- function(steps, scenarios) {
 #'
 #' @export
 link <- function(steps, scenarios, verbose=TRUE) {
-  steps <- pmap(steps, names(steps), seq_along(steps), function(step, name, index) {
+  steps <- pmap(list(steps, names(steps), seq_along(steps)), function(step, name, index) {
     attr(step, 'index') <- index
     attr(step, 'name') <- name
 
