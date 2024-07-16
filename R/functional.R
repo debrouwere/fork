@@ -59,7 +59,7 @@ skippable <- function(fn, path, otherwise) {
     fn
   } else {
     function(...) {
-      arguments <- list2(...)
+      arguments <- rlang::list2(...)
       value <- pluck(arguments, !!!path)
       if (is_falsey(value)) {
         otherwise
