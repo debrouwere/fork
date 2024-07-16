@@ -25,8 +25,8 @@ make_cache <- function(steps) {
   cache <- kvs(steps, NA)
   slots <- list2env(cache)
   attr(slots, "steps") <- steps
-  attr(slots, "hits") <- kvs(steps, 0)
-  attr(slots, "misses") <- kvs(steps, 0)
+  attr(slots, "hits") <- list2env(kvs(steps, 0))
+  attr(slots, "misses") <- list2env(kvs(steps, 0))
   slots
 }
 
@@ -47,7 +47,11 @@ increment <- function(obj, which, key) {
 #' @param key The key in which to store the cached outcome.
 #'
 #' @export
-cached <- function(fn, cache, key) {
+cached <- function(fn, cache, key = NULL) {
+  if (is.null(key)) {
+    key <- attr(fn, 'name', exact = TRUE)
+  }
+
   function(...) {
     if (all(is.na(cache[[key]]))) {
       increment(cache, 'misses', key)
