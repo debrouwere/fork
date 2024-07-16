@@ -31,6 +31,10 @@ unsplatted <- function(fn) {
   }
 }
 
+is_falsey <- function(x) {
+  is.null(x) || is.na(x) || (is.numeric(x) && x == 0) || (is.logical(x) && !x) || (is.character(x) && str_length(x) == 0)
+}
+
 #' Wrap a function that accepts a list and produces a list, so that it merges input and output
 #'
 #' @param fn A function to modify.
@@ -38,7 +42,8 @@ unsplatted <- function(fn) {
 #' @export
 modifier <- function(fn) {
   function(input) {
-    list_modify(input, !!!fn(input))
+    output <- fn(input)
+    list_assign(input, !!!output)
   }
 }
 
@@ -51,20 +56,20 @@ modifier <- function(fn) {
 #' @export
 skippable <- function(fn, path, otherwise) {
   if (is.null(path)) {
-    key <- attr(fn, 'link', exact = TRUE)
-  }
-
-  function(...) {
-    arguments <- list2(...)
-    value <- pluck(arguments, path)
-
-    if (!value | is.na(value)) {
-      otherwise
-    } else {
-      fn(...)
+    fn
+  } else {
+    function(...) {
+      arguments <- list2(...)
+      value <- pluck(arguments, !!!path)
+      if (is_falsey(value)) {
+        otherwise
+      } else {
+        fn(...)
+      }
     }
   }
 }
+
 
 # like `identity` but with a splat
 
@@ -119,11 +124,7 @@ obj_to_chr <- function(x) {
 #' @param name Name of the function.
 #'
 #' @export
-rethrow_with_arguments <- function(fn, name = NULL) {
-  if (is.null(name)) {
-    name <- attr(fn, 'name', exact = TRUE)
-  }
-
+rethrow_with_arguments <- function(fn, name = '(unknown)') {
   function(...) {
     args <- rlang::dots_list(..., .named = TRUE)
     rlang::try_fetch(

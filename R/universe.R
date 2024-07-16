@@ -41,25 +41,18 @@ describe_steps <- function(steps, scenarios) {
 #'
 #' @param steps a named list of functions
 #' @param scenarios a data frame or tibble with a multiverse specification
-#' @param verbose TRUE to print links that were established
 #'
 #' @export
-link <- function(steps, scenarios, verbose=TRUE) {
+link <- function(steps, scenarios) {
   pmap(list(steps, names(steps), seq_along(steps)), function(step, name, index) {
-    attr(step, 'index') <- index
-    attr(step, 'name') <- name
-
     if (name %in% colnames(scenarios)) {
       # support for df-columns, select with `purrr:pluck(df, !!!path)`
       if (is_tibble(scenarios[[name]])) {
-        path <- c(name, name)
+        c(name, name)
       } else {
-        path <- c(name)
+        c(name)
       }
-      attr(step, 'link') <- path
     }
-    
-    step
   })
 }
 
