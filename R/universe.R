@@ -39,9 +39,9 @@ describe_steps <- function(steps, scenarios) {
 
 #' Link steps to scenario columns
 #'
-#' @param steps
-#' @param scenarios
-#' @param verbose
+#' @param steps a named list of functions
+#' @param scenarios a data frame or tibble with a multiverse specification
+#' @param verbose TRUE to print links that were established
 #'
 #' @export
 link <- function(steps, scenarios, verbose=TRUE) {
@@ -63,8 +63,8 @@ link <- function(steps, scenarios, verbose=TRUE) {
 
 #' Reroute named arguments (or a component thereof) to other named arguments
 #'
-#' @param fn
-#' @param ...
+#' @param fn a function whose arguments to intercept
+#' @param ... a mapping of destination=c('path', 'to', 'source') as used by `purrr:pluck`
 #'
 #' @export
 #'

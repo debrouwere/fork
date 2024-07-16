@@ -38,29 +38,29 @@ the scenes each function accepts a list and returns a list.
 }
 \examples{
 scenarios <- expand_grid(
-  add=1:3,
-  multiply=1:3
+  add = 1:3,
+  multiply = 1:3
 )
 steps <- list(
-  add=function(add, ...) {
+  add = function(add, ...) {
     list(
       sum = 10 + add
     )
   },
-  multiply=function(sum, multiply, ...) {
-    list(result=tibble(
-      sumprod=sum * multiply
+  multiply = function(sum, multiply, ...) {
+    list(result = tibble(
+      sumprod = sum * multiply
     ))
   }
 )
 
-analyze <- compose_steps(steps, cache=NULL)
+analyze <- compose_steps(steps, cache = NULL)
 
 # we'll create a cache but refrain from using it for now
 cache <- make_cache(steps)
-analyze_and_cache <- compose_steps(steps, cache=cache)
+analyze_and_cache <- compose_steps(steps, cache = cache)
 
-result <- analyze(add=1, multiply=2)
+result <- analyze(add = 1, multiply = 2)
 expect_equal(result, 22)
 
 results <- scenarios |> row_modify(analyze)

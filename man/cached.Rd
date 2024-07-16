@@ -4,7 +4,7 @@
 \alias{cached}
 \title{Wrap a function to cache its outcome}
 \usage{
-cached(fn, cache, key)
+cached(fn, cache, key = NULL)
 }
 \arguments{
 \item{fn}{A function to modify.}
