@@ -100,7 +100,7 @@ splat <- function(...) {
 row_modify <- function(data, fn) {
   results <- data |>
     group_by(.ix = row_number()) |>
-    group_modify(\(x, g) fn(x)) |>
+    group_modify(\(x, g) fn(as.list(x))) |>
     ungroup() |>
     select(-.ix)
   bind_cols(data, results)
