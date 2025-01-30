@@ -105,6 +105,9 @@ replace_na_with_false <- function(data, names = NULL) {
 #' @return An integer vector with cache invalidation positions.
 #' @export
 plan_cache_invalidation <- function(scenarios, cache) {
+  n <- nrow(scenarios)
+  if (n < 2) return(rep(1, n))
+
   prefixes <- attr(cache, 'steps', exact = TRUE)
   missing_steps <- setdiff(prefixes, colnames(scenarios))
   parameters <- scenarios
@@ -114,7 +117,7 @@ plan_cache_invalidation <- function(scenarios, cache) {
     mutate(across(everything(), as.character)) |>
     mutate(across(everything(), ~ replace_na(.x, "<NA>")))
 
-  start_at_j <- map_int(2:nrow(parameters), function(i) {
+  start_at_j <- map_int(2:n, function(i) {
     ix <- which.min(parameters[i, ] == parameters[i - 1, ])
   })
 
